@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>デイサービス料金計算</title>
+<title>デイサービス料金 概算計算</title>
 </head>
 
 <body style="margin:0; background:#f5f5f5;">
@@ -18,7 +18,7 @@
   box-shadow:0 4px 10px rgba(0,0,0,0.05);
 ">
 
-  <h3>デイサービス料金 簡易計算</h3>
+  <h3>デイサービス料金 概算計算</h3>
 
   <label>要介護度</label><br>
   <select id="level">
@@ -63,13 +63,13 @@
 ※7時間以上利用(送迎有)で計算しています。<br>
 ※地域単価10円で計算しています。<br>
 ※処遇改善加算9%を含みます。<br>
-※おおよその金額です。
+※本計算は概算です。実際の請求額とは異なる場合があります。
 </p>
 </div>
 
 <script>
 const UNIT_PRICE = 10;
-const IMPROVEMENT_RATE = 0.09; // 9%
+const IMPROVEMENT_RATE = 0.09;
 
 function fill(id){
   const s=document.getElementById(id);
@@ -108,25 +108,18 @@ function calc(){
     base = levelValue * days;
   }
 
-  // 入浴
   const bathAdd = bath * 40 * UNIT_PRICE;
 
-  // 介護保険対象（加算前）
   const careTotal = base + bathAdd;
 
-  // ★ 処遇改善加算
   const improvement = Math.round(careTotal * IMPROVEMENT_RATE);
 
-  // 加算込み
   const careTotalWithAdd = careTotal + improvement;
 
-  // 自己負担
   const userCare = Math.round(careTotalWithAdd * rate);
 
-  // 食費
   const mealCost = meal * 640;
 
-  // 総額
   const totalPay = userCare + mealCost;
 
   document.getElementById("result").innerHTML =
@@ -147,7 +140,6 @@ document.querySelectorAll("select").forEach(s=>{
 });
 
 calc();
-
 </script>
 
 </body>
