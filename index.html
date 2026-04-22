@@ -5,9 +5,19 @@
 <title>デイサービス料金計算</title>
 </head>
 
-<body>
+<body style="margin:0; background:#f5f5f5;">
 
-<div style="max-width:420px;padding:16px;border:1px solid #ccc;border-radius:10px;font-family:sans-serif;">
+<div style="
+  max-width:420px;
+  padding:16px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-family:sans-serif;
+  margin:40px auto;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+">
+
   <h3>デイサービス料金 簡易計算</h3>
 
   <!-- 要介護度 -->
@@ -58,7 +68,7 @@
 </div>
 
 <script>
-// 地域単価（必要に応じて変更）
+// 地域単価
 const UNIT_PRICE = 10;
 
 // 回数セレクト生成
@@ -87,27 +97,25 @@ function calc(){
   let meal = Number(document.getElementById("meal").value);
   const rate = Number(document.getElementById("rate").value);
 
-  // 回数の整合性チェック
+  // 回数の整合性
   bath = Math.min(bath, days);
   meal = Math.min(meal, days);
 
-  // 要支援判定（安全）
+  // 要支援判定
   const isSupport = ["要支援1","要支援2"].includes(levelText);
 
   let base = 0;
 
   if(isSupport){
-    // 月額固定
-    base = levelValue;
+    base = levelValue; // 月額
   }else{
-    // 要介護は日額×日数
-    base = levelValue * days;
+    base = levelValue * days; // 日額×日数
   }
 
-  // 入浴（40単位 → 円）
+  // 入浴（40単位）
   const bathAdd = bath * 40 * UNIT_PRICE;
 
-  // 食事（全額自己負担）
+  // 食費
   const mealCost = meal * 640;
 
   // 介護保険対象
@@ -135,7 +143,7 @@ document.querySelectorAll("select").forEach(s=>{
   s.addEventListener("change", calc);
 });
 
-// 初期計算
+// 初期表示
 calc();
 
 </script>
