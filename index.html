@@ -20,7 +20,6 @@
 
   <h3>デイサービス料金 簡易計算</h3>
 
-  <!-- 要介護度 -->
   <label>要介護度</label><br>
   <select id="level">
     <option value="17980">要支援1</option>
@@ -63,15 +62,15 @@
   <p style="font-size:12px;color:#666;margin-top:15px;border-top:1px solid #ddd;padding-top:10px;">
 ※7時間以上利用(送迎有)で計算しています。<br>
 ※地域単価10円で計算しています。<br>
+※処遇改善加算9%を含みます。<br>
 ※おおよその金額です。
 </p>
 </div>
 
 <script>
-// 地域単価
 const UNIT_PRICE = 10;
+const IMPROVEMENT_RATE = 0.09; // 9%
 
-// 回数セレクト生成
 function fill(id){
   const s=document.getElementById(id);
   for(let i=1;i<=31;i++){
@@ -85,7 +84,6 @@ fill("days");
 fill("bath");
 fill("meal");
 
-// 計算処理
 function calc(){
 
   const levelSelect = document.getElementById("level");
@@ -97,39 +95,45 @@ function calc(){
   let meal = Number(document.getElementById("meal").value);
   const rate = Number(document.getElementById("rate").value);
 
-  // 回数の整合性
   bath = Math.min(bath, days);
   meal = Math.min(meal, days);
 
-  // 要支援判定
   const isSupport = ["要支援1","要支援2"].includes(levelText);
 
   let base = 0;
 
   if(isSupport){
-    base = levelValue; // 月額
+    base = levelValue;
   }else{
-    base = levelValue * days; // 日額×日数
+    base = levelValue * days;
   }
 
-  // 入浴（40単位）
+  // 入浴
   const bathAdd = bath * 40 * UNIT_PRICE;
+
+  // 介護保険対象（加算前）
+  const careTotal = base + bathAdd;
+
+  // ★ 処遇改善加算
+  const improvement = Math.round(careTotal * IMPROVEMENT_RATE);
+
+  // 加算込み
+  const careTotalWithAdd = careTotal + improvement;
+
+  // 自己負担
+  const userCare = Math.round(careTotalWithAdd * rate);
 
   // 食費
   const mealCost = meal * 640;
-
-  // 介護保険対象
-  const careTotal = base + bathAdd;
-
-  // 自己負担
-  const userCare = Math.round(careTotal * rate);
 
   // 総額
   const totalPay = userCare + mealCost;
 
   document.getElementById("result").innerHTML =
     "【介護保険対象】<br>" +
-    "合計：" + careTotal.toLocaleString() + "円<br>" +
+    "基本＋加算：" + careTotal.toLocaleString() + "円<br>" +
+    "処遇改善加算：" + improvement.toLocaleString() + "円<br>" +
+    "合計：" + careTotalWithAdd.toLocaleString() + "円<br>" +
     "自己負担：" + userCare.toLocaleString() + "円<br><br>" +
 
     "【食費（全額自己負担）】<br>" +
@@ -138,12 +142,10 @@ function calc(){
     "<b>お支払い合計：" + totalPay.toLocaleString() + "円</b>";
 }
 
-// 自動計算
 document.querySelectorAll("select").forEach(s=>{
   s.addEventListener("change", calc);
 });
 
-// 初期表示
 calc();
 
 </script>
