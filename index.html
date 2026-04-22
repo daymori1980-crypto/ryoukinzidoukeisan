@@ -46,21 +46,22 @@
     <option value="0.3">3割</option>
   </select>
 
-  <br><br>
-
-  <button onclick="calc()">計算する</button>
-
   <hr>
 
-  <div id="result"></div>
+  <div id="result">条件を選択すると自動計算されます</div>
+
   <p style="font-size:12px;color:#666;margin-top:15px;border-top:1px solid #ddd;padding-top:10px;">
 ※7時間以上利用(送迎有)で計算しています。<br>
-※おおよその金額になります。ご参考としてください。
+※地域単価10円で計算しています。<br>
+※おおよその金額です。
 </p>
 </div>
 
 <script>
-// 1〜31回生成
+// 地域単価（必要に応じて変更）
+const UNIT_PRICE = 10;
+
+// 回数セレクト生成
 function fill(id){
   const s=document.getElementById(id);
   for(let i=1;i<=31;i++){
@@ -74,19 +75,28 @@ fill("days");
 fill("bath");
 fill("meal");
 
+// 計算処理
 function calc(){
-  const levelText = document.getElementById("level").selectedIndex;
-  const levelValue = Number(document.getElementById("level").value);
 
-  const days = Number(document.getElementById("days").value);
-  const bath = Number(document.getElementById("bath").value);
-  const meal = Number(document.getElementById("meal").value);
+  const levelSelect = document.getElementById("level");
+  const levelText = levelSelect.selectedOptions[0].text;
+  const levelValue = Number(levelSelect.value);
+
+  let days = Number(document.getElementById("days").value);
+  let bath = Number(document.getElementById("bath").value);
+  let meal = Number(document.getElementById("meal").value);
   const rate = Number(document.getElementById("rate").value);
+
+  // 回数の整合性チェック
+  bath = Math.min(bath, days);
+  meal = Math.min(meal, days);
+
+  // 要支援判定（安全）
+  const isSupport = ["要支援1","要支援2"].includes(levelText);
 
   let base = 0;
 
-  // ■ 要支援かどうか判定（0と1が要支援）
-  if(levelText === 0 || levelText === 1){
+  if(isSupport){
     // 月額固定
     base = levelValue;
   }else{
@@ -94,31 +104,40 @@ function calc(){
     base = levelValue * days;
   }
 
-  // ■ 入浴加算（1回40円、負担割合対象）
-  const bathAdd = bath * 400;
+  // 入浴（40単位 → 円）
+  const bathAdd = bath * 40 * UNIT_PRICE;
 
-  // ■ 食事（1食640円、全額自己負担）
+  // 食事（全額自己負担）
   const mealCost = meal * 640;
 
-  // ■ 介護保険対象合計
+  // 介護保険対象
   const careTotal = base + bathAdd;
 
-  // ■ 自己負担（割合適用）
+  // 自己負担
   const userCare = Math.round(careTotal * rate);
 
-  // ■ 最終支払額（食事は別）
+  // 総額
   const totalPay = userCare + mealCost;
 
   document.getElementById("result").innerHTML =
     "【介護保険対象】<br>" +
-    "合計：" + careTotal + "円<br>" +
-    "自己負担：" + userCare + "円<br><br>" +
+    "合計：" + careTotal.toLocaleString() + "円<br>" +
+    "自己負担：" + userCare.toLocaleString() + "円<br><br>" +
 
-    "【食事代（全額）】<br>" +
-    mealCost + "円<br><br>" +
+    "【食費（全額自己負担）】<br>" +
+    mealCost.toLocaleString() + "円<br><br>" +
 
-    "<b>お支払い合計：" + totalPay + "円</b>";
+    "<b>お支払い合計：" + totalPay.toLocaleString() + "円</b>";
 }
+
+// 自動計算
+document.querySelectorAll("select").forEach(s=>{
+  s.addEventListener("change", calc);
+});
+
+// 初期計算
+calc();
+
 </script>
 
 </body>
