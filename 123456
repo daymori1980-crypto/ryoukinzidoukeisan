@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>デイサービス料金計算</title>
+</head>
+
+<body>
+
+<div style="max-width:420px;padding:16px;border:1px solid #ccc;border-radius:10px;font-family:sans-serif;">
+  <h3>デイサービス料金 簡易計算</h3>
+
+  <label>要介護度</label><br>
+  <select id="level">
+    <option value="650">要支援1</option>
+    <option value="700">要支援2</option>
+    <option value="750">要介護1</option>
+    <option value="800">要介護2</option>
+    <option value="850">要介護3</option>
+    <option value="900">要介護4</option>
+    <option value="950">要介護5</option>
+  </select>
+
+  <br><br>
+
+  <label>利用日数</label><br>
+  <select id="days"></select>
+
+  <br><br>
+
+  <label>入浴回数</label><br>
+  <select id="bath"></select>
+
+  <br><br>
+
+  <label>食事回数</label><br>
+  <select id="meal"></select>
+
+  <br><br>
+
+  <label>負担割合</label><br>
+  <select id="rate">
+    <option value="0.1">1割</option>
+    <option value="0.2">2割</option>
+    <option value="0.3">3割</option>
+  </select>
+
+  <br><br>
+
+  <button onclick="calc()">計算する</button>
+
+  <hr>
+
+  <div id="result"></div>
+</div>
+
+<script>
+function fill(id){
+  const s=document.getElementById(id);
+  for(let i=1;i<=31;i++){
+    const o=document.createElement("option");
+    o.value=i;
+    o.text=i+"回";
+    s.appendChild(o);
+  }
+}
+fill("days");
+fill("bath");
+fill("meal");
+
+function calc(){
+  const level=Number(document.getElementById("level").value);
+  const days=Number(document.getElementById("days").value);
+  const bath=Number(document.getElementById("bath").value);
+  const meal=Number(document.getElementById("meal").value);
+  const rate=Number(document.getElementById("rate").value);
+
+  const base=level*10;
+  const bathAdd=bath*50;
+  const mealAdd=meal*30;
+
+  const total=(base*days)+bathAdd+mealAdd;
+  const user=Math.round(total*rate);
+
+  document.getElementById("result").innerHTML=
+    "総額目安：<b>"+total+"円</b><br>"+
+    "自己負担："+user+"円";
+}
+</script>
+
+</body>
+</html>
