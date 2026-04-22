@@ -10,10 +10,11 @@
 <div style="max-width:420px;padding:16px;border:1px solid #ccc;border-radius:10px;font-family:sans-serif;">
   <h3>デイサービス料金 簡易計算</h3>
 
+  <!-- 要介護度 -->
   <label>要介護度</label><br>
   <select id="level">
-    <option value="650">要支援1</option>
-    <option value="700">要支援2</option>
+    <option value="1798">要支援1</option>
+    <option value="3621">要支援2</option>
     <option value="658">要介護1</option>
     <option value="777">要介護2</option>
     <option value="900">要介護3</option>
@@ -55,6 +56,7 @@
 </div>
 
 <script>
+// 1〜31回生成
 function fill(id){
   const s=document.getElementById(id);
   for(let i=1;i<=31;i++){
@@ -69,22 +71,49 @@ fill("bath");
 fill("meal");
 
 function calc(){
-  const level=Number(document.getElementById("level").value);
-  const days=Number(document.getElementById("days").value);
-  const bath=Number(document.getElementById("bath").value);
-  const meal=Number(document.getElementById("meal").value);
-  const rate=Number(document.getElementById("rate").value);
+  const levelText = document.getElementById("level").selectedIndex;
+  const levelValue = Number(document.getElementById("level").value);
 
-  const base=level*10;
-  const bathAdd=bath*40;
-  const mealAdd=meal*640;
+  const days = Number(document.getElementById("days").value);
+  const bath = Number(document.getElementById("bath").value);
+  const meal = Number(document.getElementById("meal").value);
+  const rate = Number(document.getElementById("rate").value);
 
-  const total=(base*days)+bathAdd+mealAdd;
-  const user=Math.round(total*rate);
+  let base = 0;
 
-  document.getElementById("result").innerHTML=
-    "総額目安：<b>"+total+"円</b><br>"+
-    "自己負担："+user+"円";
+  // ■ 要支援かどうか判定（0と1が要支援）
+  if(levelText === 0 || levelText === 1){
+    // 月額固定
+    base = levelValue;
+  }else{
+    // 要介護は日額×日数
+    base = levelValue * days;
+  }
+
+  // ■ 入浴加算（1回40円、負担割合対象）
+  const bathAdd = bath * 40;
+
+  // ■ 食事（1食640円、全額自己負担）
+  const mealCost = meal * 640;
+
+  // ■ 介護保険対象合計
+  const careTotal = base + bathAdd;
+
+  // ■ 自己負担（割合適用）
+  const userCare = Math.round(careTotal * rate);
+
+  // ■ 最終支払額（食事は別）
+  const totalPay = userCare + mealCost;
+
+  document.getElementById("result").innerHTML =
+    "【介護保険対象】<br>" +
+    "合計：" + careTotal + "円<br>" +
+    "自己負担：" + userCare + "円<br><br>" +
+
+    "【食事代（全額）】<br>" +
+    mealCost + "円<br><br>" +
+
+    "<b>お支払い合計：" + totalPay + "円</b>";
 }
 </script>
 
