@@ -14,11 +14,11 @@
   <select id="level">
     <option value="650">要支援1</option>
     <option value="700">要支援2</option>
-    <option value="750">要介護1</option>
-    <option value="800">要介護2</option>
-    <option value="850">要介護3</option>
-    <option value="900">要介護4</option>
-    <option value="950">要介護5</option>
+    <option value="658">要介護1</option>
+    <option value="777">要介護2</option>
+    <option value="900">要介護3</option>
+    <option value="1023">要介護4</option>
+    <option value="1148">要介護5</option>
   </select>
 
   <br><br>
@@ -76,8 +76,8 @@ function calc(){
   const rate=Number(document.getElementById("rate").value);
 
   const base=level*10;
-  const bathAdd=bath*50;
-  const mealAdd=meal*30;
+  const bathAdd=bath*40;
+  const mealAdd=meal*640;
 
   const total=(base*days)+bathAdd+mealAdd;
   const user=Math.round(total*rate);
